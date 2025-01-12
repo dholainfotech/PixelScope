@@ -35,7 +35,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.example.pixelscope
+        package: com.dhola.pixelscope
         pluginClass: PixelscopePlugin
 
   # To add assets to your plugin package, add an assets section, like this:

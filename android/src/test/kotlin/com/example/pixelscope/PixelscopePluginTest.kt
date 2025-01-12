@@ -1,4 +1,4 @@
-package com.example.pixelscope
+package com.dhola.pixelscope
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel

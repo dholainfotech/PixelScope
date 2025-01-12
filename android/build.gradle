@@ -1,4 +1,4 @@
-group = "com.example.pixelscope"
+group = "com.dhola.pixelscope"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -27,7 +27,7 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-    namespace = "com.example.pixelscope"
+    namespace = "com.dhola.pixelscope"
 
     compileSdk = 35
 

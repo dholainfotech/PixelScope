@@ -1,6 +1,6 @@
 // PixelscopePlugin.kt
 
-package com.example.pixelscope
+package com.dhola.pixelscope
 
 import android.content.Context
 import android.graphics.Bitmap
