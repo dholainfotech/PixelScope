@@ -1,3 +1,7 @@
+## 0.0.3
+
+* Dependencies Issue Resolved
+
 ## 0.0.2
 
 * Dependencies Requirements Changed
