@@ -6,7 +6,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
+        // maven { url 'https://jitpack.io' }
     }
 
     dependencies {
@@ -19,7 +19,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
+        // maven { url 'https://jitpack.io' }
     }
 }
 
@@ -52,7 +52,11 @@ android {
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.mockito:mockito-core:5.0.0")
-        implementation ("com.github.joyhonest:WifiCamera:7.22")
+        // implementation ("com.github.joyhonest:WifiCamera:7.22")
+        // implementation files('libs/classes.jar')
+        implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+
         implementation ("org.greenrobot:eventbus:3.3.1")
     }
 

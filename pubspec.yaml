@@ -1,6 +1,6 @@
 name: pixelscope
 description: "A new MicroScope SDK Package."
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/dholainfotech/PixelScope
 
 environment:
