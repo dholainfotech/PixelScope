@@ -131,6 +131,22 @@ class Pixelscope {
     }
   }
 
+  
+  /// Sets the video resolution.
+  /// [width]: Desired video width in pixels.
+  /// [height]: Desired video height in pixels.
+  static Future<String?> setResolution({required int width, required int height}) async {
+    try {
+      final String? result = await _channel.invokeMethod('setResolution', {
+        'width': width,
+        'height': height,
+      });
+      return result;
+    } catch (e) {
+      return 'Failed to set resolution: $e';
+    }
+  }
+
   /// Sets the contrast level.
   /// [contrast]: Contrast value between 0.0 and 1.0.
   static Future<String?> setContrast(double contrast) async {

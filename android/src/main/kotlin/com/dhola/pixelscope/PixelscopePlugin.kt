@@ -2,30 +2,26 @@
 
 package com.dhola.pixelscope
 
-import android.content.Context
+// import org.simple.eventbus.EventBus;
+
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.annotation.NonNull
 import com.joyhonest.wifination.wifination
 import com.joyhonest.wifination.wifination.OnReceiveFrame
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.*
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import java.io.ByteArrayOutputStream
 import kotlin.concurrent.thread
-import android.util.Log;
-
-//import org.simple.eventbus.EventBus;
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-
-
-
-
-class PixelscopePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
+class PixelscopePlugin :
+        FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
   private lateinit var methodChannel: MethodChannel
   private lateinit var eventChannel: EventChannel
   private var eventSink: EventChannel.EventSink? = null
@@ -37,26 +33,24 @@ class PixelscopePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
   private lateinit var wifiSSIDEventChannel: EventChannel
   private var wifiSSIDEventSink: EventChannel.EventSink? = null
 
-
-
   // Frame rate control
   private var lastFrameTime: Long = 0
   private val frameInterval: Long = 63 // Approximately 30 FPS
 
   // Frame buffer to hold the latest frame
-  @Volatile
-  private var latestFrame: Bitmap? = null
+  @Volatile private var latestFrame: Bitmap? = null
   private var isFrameBeingSent: Boolean = false
 
   // Implement the required methods for EventChannel.StreamHandler
   override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
     // Handle the main event channel's onListen
     eventSink = events
-    wifination.onReceiveFrame = object : wifination.OnReceiveFrame {
-      override fun onReceiveFrame(bmp: Bitmap) {
-        sendFrameData(eventSink, bmp)
-      }
-    }
+    wifination.onReceiveFrame =
+            object : wifination.OnReceiveFrame {
+              override fun onReceiveFrame(bmp: Bitmap) {
+                sendFrameData(eventSink, bmp)
+              }
+            }
   }
 
   override fun onCancel(arguments: Any?) {
@@ -79,14 +73,16 @@ class PixelscopePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
     firmwareVersionEventChannel = EventChannel(messenger, "pixelscope/firmware_version")
     firmwareVersionEventChannel.setStreamHandler(firmwareVersionStreamHandler)
     wifiSSIDEventChannel = EventChannel(messenger, "pixelscope/wifi_ssid")
-    wifiSSIDEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
-      override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-        wifiSSIDEventSink = events
-      }
-      override fun onCancel(arguments: Any?) {
-        wifiSSIDEventSink = null
-      }
-    })
+    wifiSSIDEventChannel.setStreamHandler(
+            object : EventChannel.StreamHandler {
+              override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                wifiSSIDEventSink = events
+              }
+              override fun onCancel(arguments: Any?) {
+                wifiSSIDEventSink = null
+              }
+            }
+    )
 
     EventBus.getDefault().register(this)
   }
@@ -100,7 +96,7 @@ class PixelscopePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
       }
       "startVideoFeed" -> {
         wifination.naSetRevBmp(true)
-//        startVideoFeed()
+        //        startVideoFeed()
         result.success("Video Feed Started")
       }
       "stopVideoFeed" -> {
@@ -134,6 +130,20 @@ class PixelscopePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
           result.success("Recording stopped")
         } else {
           result.error("INVALID_ARGUMENT", "phoneOrSD is null", null)
+        }
+      }
+      "setResolution" -> {
+        val width: Int? = call.argument("width")
+        val height: Int? = call.argument("height")
+        if (width != null && height != null) {
+          val response = wifination.naSetRecordWH(width, height)
+          if (response == 0) {
+            result.success("Resolution set to ${width}x${height}")
+          } else {
+            result.error("SET_RESOLUTION_FAILED", "Failed to set resolution", null)
+          }
+        } else {
+          result.error("INVALID_ARGUMENT", "Width or height is null", null)
         }
       }
       "setBrightness" -> {
@@ -190,7 +200,7 @@ class PixelscopePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
           result.error("INVALID_ARGUMENT", "Rotation is null", null)
         }
       }
-// Implement other settings as needed...
+      // Implement other settings as needed...
       "getWifiSSID" -> {
         wifination.naGetWifiSSID()
         result.success("Wi-Fi SSID requested")
@@ -277,22 +287,21 @@ class PixelscopePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
         }
       }
 
-
       // Additional methods will be added here...
       else -> result.notImplemented()
     }
   }
 
-
   private fun startVideoFeed() {
     // Set to receive bitmap frames
     wifination.naSetRevBmp(true)
     // Start video feed and set the frame callback
-    wifination.onReceiveFrame = object : OnReceiveFrame {
-      override fun onReceiveFrame(bmp: Bitmap) {
-        sendFrameData(eventSink, bmp)
-      }
-    }
+    wifination.onReceiveFrame =
+            object : OnReceiveFrame {
+              override fun onReceiveFrame(bmp: Bitmap) {
+                sendFrameData(eventSink, bmp)
+              }
+            }
   }
 
   private fun stopVideoFeed() {
@@ -346,35 +355,36 @@ class PixelscopePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
     }
   }
 
-  private val batteryLevelStreamHandler = object : EventChannel.StreamHandler {
-    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-      batteryLevelEventSink = events
-    }
+  private val batteryLevelStreamHandler =
+          object : EventChannel.StreamHandler {
+            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+              batteryLevelEventSink = events
+            }
 
-    override fun onCancel(arguments: Any?) {
-      batteryLevelEventSink = null
-    }
-  }
+            override fun onCancel(arguments: Any?) {
+              batteryLevelEventSink = null
+            }
+          }
 
-  private val firmwareVersionStreamHandler = object : EventChannel.StreamHandler {
-    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-      firmwareVersionEventSink = events
-    }
+  private val firmwareVersionStreamHandler =
+          object : EventChannel.StreamHandler {
+            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+              firmwareVersionEventSink = events
+            }
 
-    override fun onCancel(arguments: Any?) {
-      firmwareVersionEventSink = null
-    }
-  }
+            override fun onCancel(arguments: Any?) {
+              firmwareVersionEventSink = null
+            }
+          }
 
-//  // Register EventBus callback
-//  EventBus.getDefault().register(this)
+  //  // Register EventBus callback
+  //  EventBus.getDefault().register(this)
 
   // Implement the callback method
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onGetBattery(nBattery: Int) {
     batteryLevelEventSink?.success(nBattery)
   }
-
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   fun onFirmwareVersion(firmwareVersion: String) {
@@ -386,10 +396,6 @@ class PixelscopePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
     wifiSSIDEventSink?.success(ssid)
   }
 
-
-
-
-
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     methodChannel.setMethodCallHandler(null)
     eventChannel.setStreamHandler(null)
@@ -400,8 +406,4 @@ class PixelscopePlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventCh
     firmwareVersionEventSink = null
     EventBus.getDefault().unregister(this)
   }
-
-
-
-
 }

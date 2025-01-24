@@ -1,3 +1,7 @@
+## 0.0.4
+
+* Added SetResolution 
+
 ## 0.0.3
 
 * Dependencies Issue Resolved
