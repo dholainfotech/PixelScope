@@ -37,6 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
       await _initializeSDK();
     }
     String? result = await Pixelscope.startVideoFeed();
+    String? resolutionResult = await Pixelscope.setResolution(
+          width: 1280,
+          height: 720,
+        );
     if (result != null && result.contains('Video Feed Started')) {
       setState(() {
         _isVideoFeedStarted = true;

@@ -311,49 +311,60 @@ class PixelscopePlugin :
     wifination.onReceiveFrame = null
   }
 
+  // private fun sendFrameData(sink: EventChannel.EventSink?, bitmap: Bitmap) {
+  //   val currentTime = System.currentTimeMillis()
+  //   if (currentTime - lastFrameTime < frameInterval) {
+  //     // Update the latest frame and skip sending to control frame rate
+  //     latestFrame = bitmap
+  //     return
+  //   }
+  //   lastFrameTime = currentTime
+
+  //   synchronized(this) {
+  //     if (isFrameBeingSent) {
+  //       // Buffer the latest frame
+  //       latestFrame = bitmap
+  //       return
+  //     }
+  //     isFrameBeingSent = true
+  //   }
+
+  //   thread {
+  //     try {
+  //       val byteArrayOutputStream = ByteArrayOutputStream()
+  //       bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+  //       val frameData = byteArrayOutputStream.toByteArray()
+
+  //       Handler(Looper.getMainLooper()).post {
+  //         sink?.success(frameData)
+  //         isFrameBeingSent = false
+
+  //         synchronized(this) {
+  //           latestFrame?.let {
+  //             sendFrameData(sink, it)
+  //             latestFrame = null
+  //           }
+  //         }
+  //       }
+  //     } catch (e: Exception) {
+  //       Handler(Looper.getMainLooper()).post {
+  //         sink?.error("FRAME_COMPRESSION_ERROR", "Failed to compress frame: ${e.message}", null)
+  //         isFrameBeingSent = false
+  //       }
+  //     }
+  //   }
+  // }
+
   private fun sendFrameData(sink: EventChannel.EventSink?, bitmap: Bitmap) {
-    val currentTime = System.currentTimeMillis()
-    if (currentTime - lastFrameTime < frameInterval) {
-      // Update the latest frame and skip sending to control frame rate
-      latestFrame = bitmap
-      return
+    // Directly send the bitmap without additional processing
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+    val frameData = byteArrayOutputStream.toByteArray()
+
+    Handler(Looper.getMainLooper()).post {
+        sink?.success(frameData)
     }
-    lastFrameTime = currentTime
-
-    synchronized(this) {
-      if (isFrameBeingSent) {
-        // Buffer the latest frame
-        latestFrame = bitmap
-        return
-      }
-      isFrameBeingSent = true
-    }
-
-    thread {
-      try {
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-        val frameData = byteArrayOutputStream.toByteArray()
-
-        Handler(Looper.getMainLooper()).post {
-          sink?.success(frameData)
-          isFrameBeingSent = false
-
-          synchronized(this) {
-            latestFrame?.let {
-              sendFrameData(sink, it)
-              latestFrame = null
-            }
-          }
-        }
-      } catch (e: Exception) {
-        Handler(Looper.getMainLooper()).post {
-          sink?.error("FRAME_COMPRESSION_ERROR", "Failed to compress frame: ${e.message}", null)
-          isFrameBeingSent = false
-        }
-      }
-    }
-  }
+}
 
   private val batteryLevelStreamHandler =
           object : EventChannel.StreamHandler {
