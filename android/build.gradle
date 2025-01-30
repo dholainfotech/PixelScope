@@ -47,6 +47,10 @@ android {
 
     defaultConfig {
         minSdk = 21
+
+        
+        // Add this line to include the consumer ProGuard file
+        consumerProguardFiles 'consumer-proguard-rules.pro'
     }
 
     dependencies {
@@ -55,6 +59,8 @@ android {
         // implementation ("com.github.joyhonest:WifiCamera:7.22")
         // implementation files('libs/classes.jar')
         implementation fileTree(include: ['*.jar'], dir: 'libs')
+        implementation 'org.tensorflow:tensorflow-android:1.13.1'
+        implementation 'org.tensorflow:tensorflow-lite:+'
 
 
         implementation ("org.greenrobot:eventbus:3.3.1")
