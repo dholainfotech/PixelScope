@@ -1,3 +1,7 @@
+## 0.0.6
+
+* bug fixes in production build
+
 ## 0.0.5
 
 * bug fixes in SetResolution
